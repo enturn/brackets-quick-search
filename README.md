@@ -11,7 +11,7 @@ Toggle the extension (`View > Enable Quick Search`) to highlight selected words 
 Installation
 ------------
 
-Download and extract, or clone, the repositery and move it to the Brackets extensions folder (`Help > Show Extensions Folder`).
+Download and extract, or clone, the repository and move it to the Brackets extensions folder (`Help > Show Extensions Folder`).
 
 Restart Brackets.
 
