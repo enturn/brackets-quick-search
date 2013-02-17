@@ -1,7 +1,7 @@
 brackets-quick-search
 =====================
 
-Notepad++ style smart highlighting extension for [Brackets](http://brackets.io) text editor.
+Notepad++ style [smart highlighting](http://npp-community.tuxfamily.org/documentation/notepad-user-manual/searching/smart-highighting) extension for [Brackets](http://brackets.io) text editor.
 
 Usage
 -----
