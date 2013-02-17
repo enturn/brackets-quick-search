@@ -40,7 +40,6 @@ define(function (require, exports, module) {
         QUICKSEARCH         = 'quicksearch.toggle',
         _find               = require('find'),
         _enabled            = true,
-        _editor             = null,
         _previousQuery      = "";
     
 
@@ -123,7 +122,6 @@ define(function (require, exports, module) {
     function _handlerOff(editor) {
         _find.clear(editor);
         $(editor).off('cursorActivity', _handler);
-        _editor = null;
     }
     
     function _handlerOn(editor) {
@@ -132,17 +130,18 @@ define(function (require, exports, module) {
     
     // Toggle the extension, set the _document and register the listener.
     function _toggle() {
-        _editor = _editor || EditorManager.getActiveEditor();
         _enabled = !_enabled;
         
         // Set the new state for the menu item.
         CommandManager.get(QUICKSEARCH).setChecked(_enabled);
         
+        var editor = EditorManager.getActiveEditor();
+        
         // Register or remove listener depending on _enabled.
         if (_enabled) {
-            _handlerOn(_editor);
+            _handlerOn(editor);
         } else {
-            _handlerOff(_editor);
+            _handlerOff(editor);
         }
     }
     
