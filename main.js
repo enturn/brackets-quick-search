@@ -1,6 +1,6 @@
 // Author: Nathan Turner
 // I used brackets-automatch-pairs-master extension as starting code.
-// I'm not sure how much is considered substantial so I'll leave the below notice untouched.
+// I'm not sure how much is considered substantial so I'll leave the below notice untouched. I adopt the same license.
 
 /*
 * Copyright (c) 2013 Zaidin Amiot. All rights reserved.
