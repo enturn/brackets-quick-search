@@ -191,7 +191,8 @@ define(function (require, exports, module) {
                 }
                 
                 state.posFrom = state.posTo = searchStartPos;
-                var foundAny = findNext(editor, rev);
+                //NOTE: this was causing the cursor to move to the end of the search word
+                //var foundAny = findNext(editor, rev);
             });
             isFindFirst = false;
         }
