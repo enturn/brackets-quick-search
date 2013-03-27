@@ -44,25 +44,27 @@ define(function (require, exports, module) {
     
 
     // Extension functions.
-    
-    
-    // modified from Editor.prototype.selectWordAt 
-    function isWordSelected(line, selectedText, pos) {
-        var start = pos.ch,
-            end = pos.ch;
+     
+    function isWordSelected(line, selectedText, selection) {
+        var start = selection.start.ch, //Start is inclusive, end is exclusive.
+            end = selection.end.ch;
         
         function isWordChar(ch) {
             return (/\w/).test(ch) || ch.toUpperCase() !== ch.toLowerCase();
         }
         
-        while (start > 0 && isWordChar(line.charAt(start - 1))) {
-            --start;
-        }
-        while (end < line.length && isWordChar(line.charAt(end))) {
-            ++end;
+        // check the selectedText is all word chars
+        for (var i = 0; i < selectedText.length; ++i) {
+            if (!isWordChar(selectedText.charAt(i))) {
+                return false;
+            }
         }
         
-        return ((end - start) === selectedText.length);
+        // check the surrounding chars are not word chars
+        var startBoundary = (start === 0 || !isWordChar(line.charAt(start - 1)));
+        var endBoundary = (end === line.length || !isWordChar(line.charAt(end)));
+        
+        return startBoundary && endBoundary;
     }
     
     // modified from Editor.prototype.selectWordAt 
@@ -99,10 +101,10 @@ define(function (require, exports, module) {
                 // clear any previous searches
                 _find.clear(editor);
 
-                var pos = editor.getCursorPos(false);
-                var line = editor.document.getLine(pos.line);
+                var selection = editor.getSelection();
+                var line = editor.document.getLine(selection.start.line);
                 
-                if (isWordSelected(line, selectedText, pos)) {
+                if (isWordSelected(line, selectedText, selection)) {
                     _find.doSearch(editor, false, editor.getSelectedText());
                 }
             } else {
