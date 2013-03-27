@@ -53,11 +53,19 @@ define(function (require, exports, module) {
             return (/\w/).test(ch) || ch.toUpperCase() !== ch.toLowerCase();
         }
         
+        /*
         // check the selectedText is all word chars
         for (var i = 0; i < selectedText.length; ++i) {
             if (!isWordChar(selectedText.charAt(i))) {
                 return false;
             }
+        }
+        */
+        
+        // check the beginning and end of the selectedText are word chars
+        if (!isWordChar(selectedText.charAt(0)) 
+            || !isWordChar(selectedText.charAt(selectedText.length - 1))) {
+            return false;
         }
         
         // check the surrounding chars are not word chars
