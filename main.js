@@ -113,7 +113,8 @@ define(function (require, exports, module) {
                 var line = editor.document.getLine(selection.start.line);
                 
                 if (isWordSelected(line, selectedText, selection)) {
-                    _find.doSearch(editor, false, editor.getSelectedText());
+                    // regexp: the boundary characters make sure only the whole word is searched
+                    _find.doSearch(editor, false, '/\\b' + editor.getSelectedText() + '\\b/i');
                 }
             } else {
                 _previousQuery = "";
