@@ -53,18 +53,9 @@ define(function (require, exports, module) {
             return (/\w/).test(ch) || ch.toUpperCase() !== ch.toLowerCase();
         }
         
-        /*
-        // check the selectedText is all word chars
-        for (var i = 0; i < selectedText.length; ++i) {
-            if (!isWordChar(selectedText.charAt(i))) {
-                return false;
-            }
-        }
-        */
-        
         // check the beginning and end of the selectedText are word chars
-        if (!isWordChar(selectedText.charAt(0)) 
-            || !isWordChar(selectedText.charAt(selectedText.length - 1))) {
+        if (!isWordChar(selectedText.charAt(0))
+                || !isWordChar(selectedText.charAt(selectedText.length - 1))) {
             return false;
         }
         
@@ -119,13 +110,6 @@ define(function (require, exports, module) {
             } else {
                 _previousQuery = "";
                 _find.clear(editor);
-                /*
-                // For searching on every word near the cursor
-                //TODO fix issues of when typing
-                //TODO shouldn't override the selection highlighting
-                var word = getWordAt(line, pos);
-                _find.doSearch(editor, false, word);
-                */
             }
         }
     }
