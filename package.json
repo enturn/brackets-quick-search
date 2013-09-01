@@ -1,0 +1,12 @@
+{
+    "name": "enturn.quick-search",
+    "title": "Quick Search",
+    "description": "Automatically highlights occurrences of the selected word (like Notepad++ smart highlighting)",
+    "homepage": "https://github.com/enturn/brackets-quick-search",
+    "version": "1.0.0",
+    "author": "Nathan Turner (https://github.com/enturn)",
+    "license": "MIT",
+    "engines": {
+        "brackets": ">=0.24.0"
+    }
+}
