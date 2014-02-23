@@ -37,6 +37,7 @@ define(function (require, exports, module) {
     var CommandManager      = brackets.getModule("command/CommandManager"),
         Commands            = brackets.getModule("command/Commands"),
         Strings             = brackets.getModule("strings"),
+        ScrollTrackMarkers  = brackets.getModule("search/ScrollTrackMarkers"),
         Editor              = brackets.getModule("editor/Editor"),
         EditorManager       = brackets.getModule("editor/EditorManager");
     
@@ -46,15 +47,24 @@ define(function (require, exports, module) {
         this.posFrom = this.posTo = this.query = null;
         this.marked = [];
     }
-
-    function getSearchState(cm) {
-        // NOTE: this integrates with the builtin search.
-        if (!cm._searchState) {
-            cm._searchState = new SearchState();
-        }
-        return cm._searchState;
+    
+    function BuiltinSearchState() {
+        //NOTE: these could be subject to change in the future
+        this.searchStartPos = null;
+        this.query = null;
+        this.foundAny = false;
+        this.marked = [];
     }
 
+    function getSearchState(cm) {
+        // NOTE: this does NOT use the builtin search state anymore. If there was a way for extensions to access the builtin search API it should use that instead of this file which is an outdated copy.
+        //  previously cm._searchState
+        if (!cm._searchStateQuickSearch) {
+            cm._searchStateQuickSearch = new SearchState();
+        }
+        return cm._searchStateQuickSearch;
+    }
+    
     function getSearchCursor(cm, query, pos) {
         // Heuristic: if the query string is all lowercase, do a case insensitive search.
         return cm.getSearchCursor(query, pos, typeof query === "string" && query === query.toLowerCase());
@@ -76,6 +86,27 @@ define(function (require, exports, module) {
             //    .css("display", "inline-block")
             //    .html("<div class='alert-message' style='margin-bottom: 0'>" + e.message + "</div>");
             return "";
+        }
+    }
+    
+    function updateBuiltinSearchState(editor, query) {
+        var cm = editor._codeMirror;
+        var searchState = cm._searchState;
+        if (searchState) {
+            //NOTE: these could be subject to change in the future
+            searchState.query = parseQuery(query);
+            searchState.searchStartPos = null;
+            searchState.foundAny = false;
+
+            cm.operation(function () {
+                searchState.marked.forEach(function (markedRange) {
+                    markedRange.clear();
+                });
+            });
+            searchState.marked.length = 0;
+        } else {
+            cm._searchState = new BuiltinSearchState();
+            cm._searchState.query = parseQuery(query);
         }
     }
 
@@ -112,6 +143,8 @@ define(function (require, exports, module) {
             markedRange.clear();
         });
         state.marked.length = 0;
+        
+        ScrollTrackMarkers.clear();
     }
 
     function clearSearch(cm) {
@@ -129,6 +162,12 @@ define(function (require, exports, module) {
     function clear(editor) {
         var cm = editor._codeMirror;
         var state = getSearchState(cm);
+        
+        if (!state.query) {
+            return;
+        }
+        
+        ScrollTrackMarkers.setVisible(editor, false);
         clearSearch(cm);
         //clearHighlights(state);
         
@@ -145,7 +184,7 @@ define(function (require, exports, module) {
         var cm = editor._codeMirror;
         var state = getSearchState(cm);
         if (state.query) {
-            //findNext(editor, rev);
+            //findNext(editor, rev);            
             return;
         }
         
@@ -175,9 +214,12 @@ define(function (require, exports, module) {
                     // Temporarily change selection color to improve highlighting - see LESS code for details
                     $(cm.getWrapperElement()).addClass("find-highlighting");
                     
+                    var scrollTrackPositions = [];
+                    
                     // FUTURE: if last query was prefix of this one, could optimize by filtering existing result set
                     var cursor = getSearchCursor(cm, state.query);
                     while (cursor.findNext()) {
+                        scrollTrackPositions.push(cursor.from());
                         state.marked.push(cm.markText(cursor.from(), cursor.to(), { className: "CodeMirror-searching" }));
 
                         //Remove this section when https://github.com/marijnh/CodeMirror/issues/1155 will be fixed
@@ -188,6 +230,9 @@ define(function (require, exports, module) {
                             cursor = getSearchCursor(cm, state.query, {line: cursor.to().line + 1, ch: 0});
                         }
                     }
+
+                    ScrollTrackMarkers.setVisible(editor, true);
+                    ScrollTrackMarkers.addTickmarks(editor, scrollTrackPositions);
                 }
                 
                 state.posFrom = state.posTo = searchStartPos;
@@ -222,6 +267,7 @@ define(function (require, exports, module) {
     
     exports.doSearch = doSearch;
     exports.clear = clear;
+    exports.updateBuiltinSearchState = updateBuiltinSearchState;
     
     //CommandManager.register(Strings.CMD_FIND_NEXT,      Commands.EDIT_FIND_NEXT,     _findNext);
     //CommandManager.register(Strings.CMD_FIND_PREVIOUS,  Commands.EDIT_FIND_PREVIOUS, _findPrevious);

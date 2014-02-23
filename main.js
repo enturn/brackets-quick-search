@@ -35,11 +35,15 @@ define(function (require, exports, module) {
     var CommandManager      = brackets.getModule("command/CommandManager"),
         EditorManager       = brackets.getModule("editor/EditorManager"),
         Menus               = brackets.getModule("command/Menus"),
+        Commands            = brackets.getModule("command/Commands"),
+        Strings             = brackets.getModule("strings"),
+        FindReplace         = brackets.getModule("search/FindReplace"),
 
     // Extension variables.
         QUICKSEARCH         = 'quicksearch.toggle',
         _find               = require('find'),
         _enabled            = true,
+        _previouslySearched = false,
         _previousQuery      = "";
     
 
@@ -67,7 +71,7 @@ define(function (require, exports, module) {
     }
     
     // modified from Editor.prototype.selectWordAt 
-    function getWordAt(line, pos) {
+    /*function getWordAt(line, pos) {
         var start = pos.ch,
             end = pos.ch;
         
@@ -83,11 +87,11 @@ define(function (require, exports, module) {
         }
         
         return line.slice(start, end);
-    }
+    }*/
     
     function _handler(event, editor) {
     
-        if (editor) {
+        if (editor && !_previouslySearched) {
             
             if (editor.hasSelection()) {
                 var selectedText = editor.getSelectedText();
@@ -97,25 +101,52 @@ define(function (require, exports, module) {
                     _previousQuery = selectedText.toLowerCase();
                 }
 
+                //NOTE: move to inside isWordSelected condition if using the builtin search state
                 // clear any previous searches
                 _find.clear(editor);
+                
+                // don't allow multiple lines to be searched for
+                if(selectedText.indexOf('\n') !== -1)
+                {
+                    return;
+                }
 
                 var selection = editor.getSelection();
                 var line = editor.document.getLine(selection.start.line);
                 
                 if (isWordSelected(line, selectedText, selection)) {
+                    _find.updateBuiltinSearchState(editor, '/\\b' + selectedText + '\\b/i');
+                    
                     // regexp: the boundary characters make sure only the whole word is searched
-                    _find.doSearch(editor, false, '/\\b' + editor.getSelectedText() + '\\b/i');
+                    _find.doSearch(editor, false, '/\\b' + selectedText + '\\b/i');
                 }
             } else {
                 _previousQuery = "";
                 _find.clear(editor);
             }
         }
+        
+        // only do the quick search if starting from no selection
+        if (editor && !editor.hasSelection()) {
+            _previouslySearched = false;
+        }
     }
+    
+    // a hack to get the highlighting to work a bit better,
+    // previously a change in the find dialog would remove highlighting,
+    // then another change would bring it back, same for ScrollTrackMarkers
+    FindReplace._registerFindInFilesCloser(function () {
+        var editor = EditorManager.getActiveEditor();
+        _find.clear(editor);
+        _previouslySearched = true;
+    });
     
     function _handlerOff(editor) {
         _find.clear(editor);
+        $(editor).off('cursorActivity', _handler);
+    }
+    
+    function _disableHandler(editor) {
         $(editor).off('cursorActivity', _handler);
     }
     
