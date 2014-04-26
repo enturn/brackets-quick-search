@@ -106,8 +106,7 @@ define(function (require, exports, module) {
                 _find.clear(editor);
                 
                 // don't allow multiple lines to be searched for
-                if(selectedText.indexOf('\n') !== -1)
-                {
+                if (selectedText.indexOf('\n') !== -1) {
                     return;
                 }
 
