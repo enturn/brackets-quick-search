@@ -89,6 +89,30 @@ define(function (require, exports, module) {
         return line.slice(start, end);
     }*/
     
+    function escapeRegexpChars(selectedText) {
+        function contains(list, text) {
+            var i, length = list.length;
+            for (i = 0; i < length; ++i) {
+                if (text === list[i]) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        
+        var result = "", i, length = selectedText.length;
+        var regexpChars = ["(", ")", "\\", "/", "*", "+", ".", "^", "$", ":", "?", "[", "]", "|", "{", "}"];
+
+        for (i = 0; i < length; ++i) {
+            if (contains(regexpChars, selectedText[i])) {
+                result += "\\" + selectedText[i];
+            } else {
+                result += selectedText[i];
+            }
+        }
+        return result;
+    }
+    
     function _handler(event, editor) {
     
         if (editor && !_previouslySearched) {
@@ -114,6 +138,9 @@ define(function (require, exports, module) {
                 var line = editor.document.getLine(selection.start.line);
                 
                 if (isWordSelected(line, selectedText, selection)) {
+                    // make sure certain characters are escaped for the regexp
+                    selectedText = escapeRegexpChars(selectedText);
+                    
                     _find.updateBuiltinSearchState(editor, '/\\b' + selectedText + '\\b/i');
                     
                     // regexp: the boundary characters make sure only the whole word is searched
