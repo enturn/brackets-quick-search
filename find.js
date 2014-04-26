@@ -166,7 +166,7 @@ define(function (require, exports, module) {
         if (!state.query) {
             return;
         }
-        
+
         ScrollTrackMarkers.setVisible(editor, false);
         clearSearch(cm);
         //clearHighlights(state);
@@ -204,7 +204,9 @@ define(function (require, exports, module) {
                 }
                 state.query = parseQuery(query);
                 if (!state.query) {
-                    cm.setCursor(searchStartPos);
+                    //BUG this caused an issue where the default select highlighting is removed,
+                    //  there doesn't seem to be any problem removing this
+                    //cm.setCursor(searchStartPos);
                     return;
                 }
                 
