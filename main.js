@@ -45,7 +45,13 @@ define(function (require, exports, module) {
         _enabled            = true,
         _previouslySearched = false,
         _previousQuery      = "";
-    
+
+    // Some Find APIs were moved recently
+    var FindInFilesUI = undefined;
+    if (parseFloat(brackets.metadata.apiVersion) >= 0.41) {
+        FindInFilesUI = brackets.getModule("search/FindInFilesUI");
+    }
+
 
     // Extension functions.
      
@@ -161,12 +167,18 @@ define(function (require, exports, module) {
     // a hack to get the highlighting to work a bit better,
     // previously a change in the find dialog would remove highlighting,
     // then another change would bring it back, same for ScrollTrackMarkers
-    FindReplace._registerFindInFilesCloser(function () {
-        var editor = EditorManager.getActiveEditor();
-        _find.clear(editor);
-        _previouslySearched = true;
-    });
-    
+    try {
+        if (parseFloat(brackets.metadata.apiVersion) < 0.41) {
+            FindReplace._registerFindInFilesCloser(function () {
+                var editor = EditorManager.getActiveEditor();
+                _find.clear(editor);
+                _previouslySearched = true;
+            });
+        }
+    } catch (e) {
+        console.warn("FindReplace._registerFindInFilesCloser() no longer exists");
+    }
+
     function _handlerOff(editor) {
         _find.clear(editor);
         $(editor).off('cursorActivity', _handler);
