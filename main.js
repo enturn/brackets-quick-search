@@ -38,7 +38,8 @@ define(function (require, exports, module) {
         Commands            = brackets.getModule("command/Commands"),
         Strings             = brackets.getModule("strings"),
         FindReplace         = brackets.getModule("search/FindReplace"),
-
+        FindBar,
+        
     // Extension variables.
         QUICKSEARCH         = 'quicksearch.toggle',
         _find               = require('find'),
@@ -46,12 +47,9 @@ define(function (require, exports, module) {
         _previouslySearched = false,
         _previousQuery      = "";
 
-    // Some Find APIs were moved recently
-    var FindInFilesUI;
     if (parseFloat(brackets.metadata.apiVersion) >= 0.41) {
-        FindInFilesUI = brackets.getModule("search/FindInFilesUI");
+        FindBar = brackets.getModule("search/FindBar");
     }
-
 
     // Extension functions.
      
@@ -166,17 +164,26 @@ define(function (require, exports, module) {
     
     // a hack to get the highlighting to work a bit better,
     // previously a change in the find dialog would remove highlighting,
-    // then another change would bring it back, same for ScrollTrackMarkers
-    try {
-        if (parseFloat(brackets.metadata.apiVersion) < 0.41) {
+    // then another change would bring it back, same for ScrollTrackMarkers.
+    // This makes sure when the find bar is opened the search is only done by
+    // the internal search.
+    function DummyFindBar() {}
+    DummyFindBar.prototype.close = function () {
+        var editor = EditorManager.getActiveEditor();
+        _find.clear(editor);
+        _previouslySearched = true;
+    };
+    
+    if (parseFloat(brackets.metadata.apiVersion) < 0.41) {
+        try {
             FindReplace._registerFindInFilesCloser(function () {
-                var editor = EditorManager.getActiveEditor();
-                _find.clear(editor);
-                _previouslySearched = true;
+                new DummyFindBar().close();
             });
+        } catch (e) {
+            console.warn("FindReplace._registerFindInFilesCloser() no longer exists");
         }
-    } catch (e) {
-        console.warn("FindReplace._registerFindInFilesCloser() no longer exists");
+    } else if (parseFloat(brackets.metadata.apiVersion) >= 0.41) {
+        FindBar._addFindBar(new DummyFindBar());
     }
 
     function _handlerOff(editor) {
