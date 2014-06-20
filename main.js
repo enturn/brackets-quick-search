@@ -47,7 +47,7 @@ define(function (require, exports, module) {
         _previousQuery      = "";
 
     // Some Find APIs were moved recently
-    var FindInFilesUI = undefined;
+    var FindInFilesUI;
     if (parseFloat(brackets.metadata.apiVersion) >= 0.41) {
         FindInFilesUI = brackets.getModule("search/FindInFilesUI");
     }
