@@ -48,7 +48,7 @@ define(function (require, exports, module) {
         _previousQuery      = "";
 
     if (parseFloat(brackets.metadata.apiVersion) >= 0.41) {
-        FindBar = brackets.getModule("search/FindBar");
+        FindBar = brackets.getModule("search/FindBar").FindBar;
     }
 
     // Extension functions.
