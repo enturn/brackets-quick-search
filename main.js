@@ -52,13 +52,14 @@ define(function (require, exports, module) {
     }
 
     // Extension functions.
-     
+    
+    // similar to Editor.prototype.selectWordAt 
     function isWordSelected(line, selectedText, selection) {
         var start = selection.start.ch, //Start is inclusive, end is exclusive.
             end = selection.end.ch;
-        
+
         function isWordChar(ch) {
-            return (/\w/).test(ch) || ch.toUpperCase() !== ch.toLowerCase();
+            return (/\w|[$]/).test(ch) || ch.toUpperCase() !== ch.toLowerCase();
         }
         
         // check the beginning and end of the selectedText are word chars
@@ -74,47 +75,9 @@ define(function (require, exports, module) {
         return startBoundary && endBoundary;
     }
     
-    // modified from Editor.prototype.selectWordAt 
-    /*function getWordAt(line, pos) {
-        var start = pos.ch,
-            end = pos.ch;
-        
-        function isWordChar(ch) {
-            return (/\w/).test(ch) || ch.toUpperCase() !== ch.toLowerCase();
-        }
-        
-        while (start > 0 && isWordChar(line.charAt(start - 1))) {
-            --start;
-        }
-        while (end < line.length && isWordChar(line.charAt(end))) {
-            ++end;
-        }
-        
-        return line.slice(start, end);
-    }*/
-    
     function escapeRegexpChars(selectedText) {
-        function contains(list, text) {
-            var i, length = list.length;
-            for (i = 0; i < length; ++i) {
-                if (text === list[i]) {
-                    return true;
-                }
-            }
-            return false;
-        }
-        
-        var result = "", i, length = selectedText.length;
-        var regexpChars = ["(", ")", "\\", "/", "*", "+", ".", "^", "$", ":", "?", "[", "]", "|", "{", "}"];
-
-        for (i = 0; i < length; ++i) {
-            if (contains(regexpChars, selectedText[i])) {
-                result += "\\" + selectedText[i];
-            } else {
-                result += selectedText[i];
-            }
-        }
-        return result;
+        //http://stackoverflow.com/questions/3115150/how-to-escape-regular-expression-special-characters-using-javascript
+        return selectedText.replace(/[\-\[\]{}()*+?.,\\$\^|#\s]/g, "\\$&");
     }
     
     function _handler(event, editor) {
@@ -145,10 +108,14 @@ define(function (require, exports, module) {
                     // make sure certain characters are escaped for the regexp
                     selectedText = escapeRegexpChars(selectedText);
                     
-                    _find.updateBuiltinSearchState(editor, '/\\b' + selectedText + '\\b/i');
-                    
-                    // regexp: the boundary characters make sure only the whole word is searched
-                    _find.doSearch(editor, false, '/\\b' + selectedText + '\\b/i');
+                    // the boundary characters make sure only the whole word is searched
+                    var regexp = '/\\b' + selectedText + '\\b/i';
+                    var selectedStartsWith = selectedText.slice(0, 2);
+                    if (selectedStartsWith === '\\$') {
+                        regexp = '/' + selectedText + '\\b/i';
+                    }
+                    _find.updateBuiltinSearchState(editor, regexp);
+                    _find.doSearch(editor, false, regexp);
                 }
             } else {
                 _previousQuery = "";
@@ -173,7 +140,7 @@ define(function (require, exports, module) {
         _find.clear(editor);
         _previouslySearched = true;
     };
-    
+
     if (parseFloat(brackets.metadata.apiVersion) < 0.41) {
         try {
             FindReplace._registerFindInFilesCloser(function () {
