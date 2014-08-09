@@ -106,6 +106,7 @@ define(function (require, exports, module) {
                 
                 if (isWordSelected(line, selectedText, selection)) {
                     // make sure certain characters are escaped for the regexp
+                    var rawText = selectedText;
                     selectedText = escapeRegexpChars(selectedText);
                     
                     // the boundary characters make sure only the whole word is searched
@@ -115,7 +116,7 @@ define(function (require, exports, module) {
                         regexp = '/' + selectedText + '\\b/i';
                     }
                     _find.updateBuiltinSearchState(editor, regexp);
-                    _find.doSearch(editor, false, regexp);
+                    _find.doSearch(editor, false, regexp, rawText);
                 }
             } else {
                 _previousQuery = "";

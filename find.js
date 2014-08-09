@@ -180,7 +180,7 @@ define(function (require, exports, module) {
      * If no search pending, opens the search dialog. If search is already open, moves to
      * next/prev result (depending on 'rev')
      */
-    function doSearch(editor, rev, initialQuery) {
+    function doSearch(editor, rev, initialQuery, rawQuery) {
         var cm = editor._codeMirror;
         var state = getSearchState(cm);
         if (state.query) {
@@ -222,7 +222,12 @@ define(function (require, exports, module) {
                     var cursor = getSearchCursor(cm, state.query);
                     while (cursor.findNext()) {
                         scrollTrackPositions.push(cursor.from());
-                        state.marked.push(cm.markText(cursor.from(), cursor.to(), { className: "CodeMirror-searching" }));
+                        var foundText = editor.document.getRange(cursor.from(), cursor.to());
+                        if (foundText === rawQuery) {
+                            state.marked.push(cm.markText(cursor.from(), cursor.to(), { className: "CodeMirror-searching" }));
+                        } else {
+                            state.marked.push(cm.markText(cursor.from(), cursor.to(), { className: "CodeMirror-matchingtag"}));
+                        }
 
                         //Remove this section when https://github.com/marijnh/CodeMirror/issues/1155 will be fixed
                         if (cursor.pos.match && cursor.pos.match[0] === "") {
