@@ -138,8 +138,11 @@ define(function (require, exports, module) {
     function DummyFindBar() {}
     DummyFindBar.prototype.close = function () {
         var editor = EditorManager.getActiveEditor();
-        _find.clear(editor);
-        _previouslySearched = true;
+        // active editor is null when no open files
+        if (editor) {
+            _find.clear(editor);
+            _previouslySearched = true;
+        }
     };
 
     if (parseFloat(brackets.metadata.apiVersion) < 0.41) {
