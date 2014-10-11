@@ -119,8 +119,10 @@ define(function (require, exports, module) {
                     _find.doSearch(editor, false, regexp, rawText);
                 }
             } else {
-                _previousQuery = "";
-                _find.clear(editor);
+                if (_previousQuery !== "") {
+                    _previousQuery = "";
+                    _find.clear(editor);
+                }
             }
         }
         
