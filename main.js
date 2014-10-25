@@ -147,6 +147,11 @@ define(function (require, exports, module) {
         }
     };
 
+    // should always return true, since it's a dummybar.
+    DummyFindBar.prototype.isClosed = function () {
+        return true;
+    };
+
     if (parseFloat(brackets.metadata.apiVersion) < 0.41) {
         try {
             FindReplace._registerFindInFilesCloser(function () {
