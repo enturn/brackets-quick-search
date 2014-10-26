@@ -146,6 +146,29 @@ define(function (require, exports, module) {
             _previouslySearched = true;
         }
     };
+    // the other FindBar functions in case they're needed
+    DummyFindBar.prototype.isClosed = function () { return true; };
+    DummyFindBar.prototype.open = function () { };
+    DummyFindBar.prototype.getOptions = function () { return {}; };
+    DummyFindBar.prototype.getQueryInfo = function () {
+        return {
+            query: _previousQuery || "",
+            isCaseSensitive: false,
+            isRegexp: true
+        };
+    };
+    DummyFindBar.prototype.showError = function (error, isHTML) { };
+    DummyFindBar.prototype.showFindCount = function (count) { };
+    DummyFindBar.prototype.showNoResults = function (showIndicator, showMessage) { };
+    DummyFindBar.prototype.getReplaceText = function () { return ""; };
+    DummyFindBar.prototype.enable = function (enable) { };
+    DummyFindBar.prototype.isEnabled = function () { return false; };
+    DummyFindBar.prototype.isReplaceEnabled = function () { return false; };
+    DummyFindBar.prototype.enableNavigation = function (enable) { };
+    DummyFindBar.prototype.enableReplace = function (enable) { };
+    DummyFindBar.prototype.focusQuery = function () { };
+    DummyFindBar.prototype.focusReplace = function () { };
+    
 
     if (parseFloat(brackets.metadata.apiVersion) < 0.41) {
         try {
