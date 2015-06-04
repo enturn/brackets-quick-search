@@ -6,7 +6,7 @@ Notepad++ style [smart highlighting](http://npp-community.tuxfamily.org/document
 Usage
 -----
 
-Toggle the extension (`View > Enable Quick Search`) to highlight selected words in the active editor. Cycle through the search results with the find next key (F3). Works with inline editors.
+Toggle the extension (`View > Enable Quick Search`) to highlight selected words in the active editor. Cycle through the search results with the find next key (F3 on PC or Cmd+G on Mac). Works with inline editors.
 
 Installation
 ------------
