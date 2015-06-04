@@ -85,7 +85,7 @@ define(function (require, exports, module) {
         if (editor && !_previouslySearched) {
             
             if (editor.hasSelection()) {
-                var selectedText = editor.getSelectedText();
+                var selectedText = editor.getSelectedText(true);
                 if (selectedText.toLowerCase() === _previousQuery) {
                     return; // let internal search do the findNext
                 } else {
