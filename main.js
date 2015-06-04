@@ -184,15 +184,15 @@ define(function (require, exports, module) {
 
     function _handlerOff(editor) {
         _find.clear(editor);
-        $(editor).off('cursorActivity', _handler);
+        editor.off('cursorActivity', _handler);
     }
     
     function _disableHandler(editor) {
-        $(editor).off('cursorActivity', _handler);
+        editor.off('cursorActivity', _handler);
     }
     
     function _handlerOn(editor) {
-        $(editor).on('cursorActivity', _handler);
+        editor.on('cursorActivity', _handler);
     }
     
     // Toggle the extension, set the _document and register the listener.
@@ -213,7 +213,7 @@ define(function (require, exports, module) {
     }
     
     // Reset the listeners when the active editor change.
-    $(EditorManager).on("activeEditorChange",
+    EditorManager.on("activeEditorChange",
         function (event, current, previous) {
             if (_enabled) {
                 if (previous) {
